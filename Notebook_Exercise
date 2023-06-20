@@ -1,0 +1,533 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "524908e2",
+   "metadata": {
+    "_cell_guid": "ce0b1422-71f6-40d3-bac2-59d44c361a51",
+    "_uuid": "d4c74b26-d188-46b5-a2b0-98f68247fb90",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.290242Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.289824Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.300542Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.299833Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.018946,
+     "end_time": "2023-06-20T20:13:30.302952",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.284006",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "import pickle\n",
+    "import random\n",
+    "import uuid"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "49de0ca8",
+   "metadata": {
+    "_cell_guid": "dc6e29a4-8093-414f-b010-a9b0147cbd86",
+    "_uuid": "ca9269d4-ee69-4f5f-a166-bcf9a99f63e7",
+    "papermill": {
+     "duration": 0.003292,
+     "end_time": "2023-06-20T20:13:30.310247",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.306955",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "Note taking application to test out the pickle library"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "bc975979",
+   "metadata": {
+    "_cell_guid": "0fe13e87-604b-4927-bb98-eba5c6d6568a",
+    "_uuid": "e8220e70-e0fc-443c-9b6d-876bea7f66c8",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.319570Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.318675Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.323820Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.322972Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012065,
+     "end_time": "2023-06-20T20:13:30.325858",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.313793",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "class Note():\n",
+    "    def __init__(self, title,content):\n",
+    "        self.title = title\n",
+    "        self.content = content\n",
+    "        self.id = uuid.uuid4()\n",
+    "    \n",
+    "    def __repr__(self):\n",
+    "        return f\"The contents of this note are title: '{self.title}', content: '{self.content}'.\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "e119b68e",
+   "metadata": {
+    "_cell_guid": "80794c5c-04f4-4b1d-90b6-3d82dbfb3eae",
+    "_uuid": "b8ab8c52-0549-4ad1-a364-28d09c36b2f8",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.335458Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.334796Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.345481Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.344825Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.01774,
+     "end_time": "2023-06-20T20:13:30.347579",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.329839",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "class Notebook():\n",
+    "    \n",
+    "    def __init__(self):\n",
+    "        self.notes = []\n",
+    "    \n",
+    "    def __repr__(self):\n",
+    "        return f\"This is a simple Python program that use built to explore the pickle library. The premise here is that you can create notes, delete them, store them on your local disk, and load them when necessary.\"\n",
+    "    \n",
+    "    def __len__(self):\n",
+    "        return len(self.notes)\n",
+    "    \n",
+    "    def add_note(self,title,content):\n",
+    "        note = Note(title,content)\n",
+    "        self.notes.append(note)\n",
+    "    \n",
+    "    def show_ids(self):\n",
+    "        for note in self.notes:\n",
+    "            print({\"id\":note.id})\n",
+    "    \n",
+    "    def find_note(self, target_id):\n",
+    "        lookup_id = uuid.UUID(target_id)\n",
+    "        for note in self.notes:\n",
+    "            if note.id == lookup_id:\n",
+    "                obj = {\"title\":note.title, \"content\":note.content}\n",
+    "                return obj\n",
+    "        return None\n",
+    "    \n",
+    "    ''' Save Notes to your local Disk'''\n",
+    "    def save_notes(self):\n",
+    "        with open(\"notes.pickle\", 'wb') as file:\n",
+    "            pickle.dump(self.notes,file)\n",
+    "    \n",
+    "    def load_notes(self):\n",
+    "        try:\n",
+    "            with open(\"notes.pickle\", \"rb\") as file:\n",
+    "                self.notes = pickle.load(file)\n",
+    "            print(\"Notes loaded successfully.\")\n",
+    "        except FileNotFoundError:\n",
+    "            print(\"No saved notes file found.\")\n",
+    "        except Exception as e:\n",
+    "            print(\"Error occurred while loading notes:\", str(e))\n",
+    "            \n",
+    "    def find_saved_notes(self,path):\n",
+    "        import os\n",
+    "        files = os.listdir(path)\n",
+    "        for file in files:\n",
+    "            if file.endswith(\".pickle\"):\n",
+    "                return f\"a saved note file exists in this directory\"\n",
+    "            \n",
+    "    def delete_note(self, target_id):\n",
+    "        lookup_id = uuid.UUID(target_id)\n",
+    "        for note in self.notes:\n",
+    "            if note.id == lookup_id:\n",
+    "                return f\"note id: {note.id} with the properties title: {note.title} and {note.content} has been deleted successfully!\"\n",
+    "        return None"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "41595d18",
+   "metadata": {
+    "_cell_guid": "115b9041-a581-47fc-bf09-7c966f515946",
+    "_uuid": "796f00cc-9703-4df1-8517-a8d5ecb1bded",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.356034Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.355665Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.361420Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.359899Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012304,
+     "end_time": "2023-06-20T20:13:30.363531",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.351227",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "a = Notebook()\n",
+    "a.add_note('hi', 'hello')\n",
+    "a.add_note('bye', 'good-bye')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "27a71fb3",
+   "metadata": {
+    "_cell_guid": "59dd13cb-95bb-4b62-b298-0ea7ea49dbe7",
+    "_uuid": "61baeddd-1bcd-4a06-b49d-b6d5e1ad7f64",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.372341Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.371988Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.381354Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.380174Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.015985,
+     "end_time": "2023-06-20T20:13:30.383349",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.367364",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'id': UUID('9dc925fb-9746-4f76-8b8e-e086f4ee58d1')}\n",
+      "{'id': UUID('517582ba-f655-48ae-8154-6d99002fdbb3')}\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "2"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "a.show_ids()\n",
+    "a.__len__()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "b3b1e9e7",
+   "metadata": {
+    "_cell_guid": "7137967b-4b78-47ad-8bd7-da01e1c12fd8",
+    "_uuid": "1b79a38c-c394-46c3-bb8c-aef67d9c9dd5",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.392737Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.392396Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.397750Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.396536Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012839,
+     "end_time": "2023-06-20T20:13:30.400139",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.387300",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "a.find_note(\"45c34ff4-ee4c-4f72-af98-0fb37fa72d43\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "deda69e5",
+   "metadata": {
+    "_cell_guid": "42f0e4d0-4aee-47c7-839e-9c460531cf44",
+    "_uuid": "97425069-d7cf-4836-a0ec-ed0cd09d075f",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.411245Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.410870Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.416392Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.415390Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012428,
+     "end_time": "2023-06-20T20:13:30.418304",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.405876",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "a.save_notes()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "536aa294",
+   "metadata": {
+    "_cell_guid": "703575e7-1fb2-42d6-a655-3bd54994a2b5",
+    "_uuid": "1d36d11a-4aba-4c41-ace4-a8bad463c3ff",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.427623Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.427265Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.432706Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.432081Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012473,
+     "end_time": "2023-06-20T20:13:30.434646",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.422173",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'a saved note file exists in this directory'"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "a.find_saved_notes(\"./\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "3f982059",
+   "metadata": {
+    "_cell_guid": "b30803d7-0744-42ac-b191-f1c2e897cd35",
+    "_uuid": "5d597fe8-a475-45b9-88ef-722f281ed4d5",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.444035Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.443676Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.448576Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.447567Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.011998,
+     "end_time": "2023-06-20T20:13:30.450845",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.438847",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "b= Notebook()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "fd7b084d",
+   "metadata": {
+    "_cell_guid": "23034e24-e304-4d6d-9210-00cf1a55d99c",
+    "_uuid": "00a1c97b-5c05-49fe-9b26-baa8ea8d9845",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.460505Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.460178Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.464695Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.463751Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.011608,
+     "end_time": "2023-06-20T20:13:30.466729",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.455121",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Notes loaded successfully.\n"
+     ]
+    }
+   ],
+   "source": [
+    "b.load_notes()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "d07decff",
+   "metadata": {
+    "_cell_guid": "491ab25f-7195-4305-b946-7bfe7b84de93",
+    "_uuid": "bc1c6340-34ba-4603-bb3d-4aef9e3aaaf9",
+    "collapsed": false,
+    "execution": {
+     "iopub.execute_input": "2023-06-20T20:13:30.476089Z",
+     "iopub.status.busy": "2023-06-20T20:13:30.475721Z",
+     "iopub.status.idle": "2023-06-20T20:13:30.480842Z",
+     "shell.execute_reply": "2023-06-20T20:13:30.479786Z"
+    },
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.012563,
+     "end_time": "2023-06-20T20:13:30.483374",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.470811",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'id': UUID('9dc925fb-9746-4f76-8b8e-e086f4ee58d1')}\n",
+      "{'id': UUID('517582ba-f655-48ae-8154-6d99002fdbb3')}\n"
+     ]
+    }
+   ],
+   "source": [
+    "b.show_ids()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "132c81d7",
+   "metadata": {
+    "_cell_guid": "f8966f5d-cfc1-4e43-ab8b-84e367d41408",
+    "_uuid": "364f91c2-f14e-4cf3-9de4-a63d246877b5",
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    },
+    "papermill": {
+     "duration": 0.003693,
+     "end_time": "2023-06-20T20:13:30.491372",
+     "exception": false,
+     "start_time": "2023-06-20T20:13:30.487679",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.10"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 13.249376,
+   "end_time": "2023-06-20T20:13:31.317117",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2023-06-20T20:13:18.067741",
+   "version": "2.4.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
